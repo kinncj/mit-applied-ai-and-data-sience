@@ -4,7 +4,7 @@
 
 By **Kinn Coelho Julião**
 
-🌐 **[View the paper as a web page](https://kinncj.github.io/mit-applied-ai-and-data-sience/)**
+🌐 **[View the paper as a web page](https://kinncj.github.io/mit-applied-ai-and-data-science/)**
 
 ---
 
@@ -18,18 +18,18 @@ The project explores and compares multiple architectures — from a fully connec
 
 | File | Description |
 |------|-------------|
-| [🌐 Paper (web)](https://kinncj.github.io/mit-applied-ai-and-data-sience/) | Full paper as a static web page |
-| [📓 Capstone Notebook (HTML)](https://github.com/kinncj/mit-applied-ai-and-data-sience/blob/main/facial_emotion_recognition_capstone.html) | Full Jupyter notebook export with code, visualizations, and analysis |
-| [📄 Research Paper (PDF)](https://github.com/kinncj/mit-applied-ai-and-data-sience/blob/main/facial_emotion_recognition_paper.pdf) | 8-page research paper |
-| [📊 Presentation (PDF)](https://github.com/kinncj/mit-applied-ai-and-data-sience/blob/main/facial_emotion_recognition_presentation.pdf) | 13-slide presentation |
+| [🌐 Paper (web)](https://kinncj.github.io/mit-applied-ai-and-data-science/) | Full paper as a static web page |
+| [📓 Capstone Notebook (HTML)](https://github.com/kinncj/mit-applied-ai-and-data-science/blob/main/facial_emotion_recognition_capstone.html) | Full Jupyter notebook export with code, visualizations, and analysis |
+| [📄 Research Paper (PDF)](https://github.com/kinncj/mit-applied-ai-and-data-science/blob/main/facial_emotion_recognition_paper.pdf) | 8-page research paper |
+| [📊 Presentation (PDF)](https://github.com/kinncj/mit-applied-ai-and-data-science/blob/main/facial_emotion_recognition_presentation.pdf) | 13-slide presentation |
 
 ### Direct Download Links (Raw Files)
 
 Use these links to download or share the files directly:
 
-- 📓 **Capstone Notebook** — [Download HTML](https://raw.githubusercontent.com/kinncj/mit-applied-ai-and-data-sience/main/facial_emotion_recognition_capstone.html)
-- 📄 **Research Paper** — [Download PDF](https://raw.githubusercontent.com/kinncj/mit-applied-ai-and-data-sience/main/facial_emotion_recognition_paper.pdf)
-- 📊 **Presentation** — [Download PDF](https://raw.githubusercontent.com/kinncj/mit-applied-ai-and-data-sience/main/facial_emotion_recognition_presentation.pdf)
+- 📓 **Capstone Notebook** — [Download HTML](https://raw.githubusercontent.com/kinncj/mit-applied-ai-and-data-science/main/facial_emotion_recognition_capstone.html)
+- 📄 **Research Paper** — [Download PDF](https://raw.githubusercontent.com/kinncj/mit-applied-ai-and-data-science/main/facial_emotion_recognition_paper.pdf)
+- 📊 **Presentation** — [Download PDF](https://raw.githubusercontent.com/kinncj/mit-applied-ai-and-data-science/main/facial_emotion_recognition_presentation.pdf)
 
 ## Highlights
 
