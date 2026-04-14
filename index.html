@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Facial Emotion Recognition | Kinn Coelho Julião</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #21262d;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+      --accent2: #3fb950;
+      --warn: #d29922;
+      --danger: #f85149;
+      --purple: #bc8cff;
+      --radius: 8px;
+      --max-w: 900px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    /* ── HERO ───────────────────────────────── */
+    .hero {
+      background: linear-gradient(160deg, #0d1117 0%, #161b22 60%, #0d1f3c 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 80px 24px 60px;
+      text-align: center;
+    }
+    .hero .badge {
+      display: inline-block;
+      background: rgba(88,166,255,.12);
+      border: 1px solid rgba(88,166,255,.3);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(28px,5vw,52px);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -.02em;
+      margin-bottom: 12px;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero .subtitle {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 620px;
+      margin: 0 auto 32px;
+    }
+    .hero .meta {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 36px;
+    }
+    .hero .meta strong { color: var(--text); }
+    .stat-bar {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+    .stat { text-align: center; }
+    .stat .num {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .stat .lbl { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+    .hero-links { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px;
+      border-radius: var(--radius);
+      font-size: 14px; font-weight: 600;
+      text-decoration: none;
+      transition: opacity .15s;
+    }
+    .btn:hover { opacity: .8; }
+    .btn-primary { background: var(--accent); color: #0d1117; }
+    .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+
+    /* ── LAYOUT ─────────────────────────────── */
+    .container { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }
+    section { padding: 64px 0; border-bottom: 1px solid var(--border); }
+    section:last-child { border-bottom: none; }
+    .section-label {
+      display: inline-block;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    h2 {
+      font-size: clamp(22px,3vw,32px);
+      font-weight: 800;
+      letter-spacing: -.01em;
+      margin-bottom: 20px;
+    }
+    h3 { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+    p { color: #c9d1d9; margin-bottom: 16px; }
+    p:last-child { margin-bottom: 0; }
+
+    /* ── CARDS ──────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .card-grid { display: grid; gap: 16px; }
+    .card-grid.col2 { grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); }
+    .card-grid.col3 { grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); }
+    .card-grid.col4 { grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); }
+
+    /* ── EMOTION CLASSES ────────────────────── */
+    .emotion-card { text-align: center; padding: 20px 16px; }
+    .emotion-card .emoji { font-size: 40px; margin-bottom: 8px; }
+    .emotion-card h3 { font-size: 16px; margin-bottom: 6px; }
+    .emotion-card p { font-size: 13px; color: var(--muted); margin: 0; }
+    .emotion-card.happy  { border-color: #3fb950; }
+    .emotion-card.neutral { border-color: var(--muted); }
+    .emotion-card.sad    { border-color: #58a6ff; }
+    .emotion-card.surprise { border-color: var(--purple); }
+
+    /* ── FIGURE ─────────────────────────────── */
+    .figure {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin: 24px 0;
+    }
+    .figure img {
+      width: 100%;
+      display: block;
+      background: #fff;
+    }
+    .figure figcaption {
+      padding: 12px 16px;
+      font-size: 13px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      font-style: italic;
+    }
+
+    .figure-row {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+      margin: 24px 0;
+    }
+    .figure-row .figure { margin: 0; }
+
+    /* ── TABLE ──────────────────────────────── */
+    .table-wrap { overflow-x: auto; margin: 24px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead tr { background: var(--surface2); }
+    th, td { padding: 10px 14px; border: 1px solid var(--border); text-align: left; }
+    th { font-weight: 700; color: var(--text); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+    td { color: #c9d1d9; }
+    tr.highlight td { background: rgba(88,166,255,.07); font-weight: 600; }
+    .pill {
+      display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    }
+    .pill-green  { background: rgba(63,185,80,.15);  color: var(--accent2); }
+    .pill-blue   { background: rgba(88,166,255,.15); color: var(--accent); }
+    .pill-gray   { background: rgba(139,148,158,.15); color: var(--muted); }
+    .pill-red    { background: rgba(248,81,73,.15);  color: var(--danger); }
+
+    /* ── PROGRESS ───────────────────────────── */
+    .progress-list { display: flex; flex-direction: column; gap: 14px; }
+    .progress-item { }
+    .progress-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+    .progress-label { font-size: 14px; font-weight: 600; }
+    .progress-value { font-size: 14px; color: var(--accent); font-weight: 700; }
+    .progress-bar-bg { background: var(--surface2); border-radius: 4px; height: 8px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; border-radius: 4px; transition: width .6s ease; }
+    .fill-green  { background: var(--accent2); }
+    .fill-blue   { background: var(--accent); }
+    .fill-gray   { background: var(--muted); }
+    .fill-red    { background: var(--danger); }
+    .fill-purple { background: var(--purple); }
+    .fill-warn   { background: var(--warn); }
+
+    /* ── INSIGHTS ───────────────────────────── */
+    .insight-list { display: flex; flex-direction: column; gap: 16px; }
+    .insight {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+    .insight-num {
+      width: 36px; height: 36px;
+      background: rgba(88,166,255,.12);
+      border: 1px solid rgba(88,166,255,.25);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 800; color: var(--accent);
+      flex-shrink: 0;
+    }
+    .insight-body h3 { font-size: 15px; margin-bottom: 4px; }
+    .insight-body p { font-size: 14px; color: var(--muted); margin: 0; }
+
+    /* ── TCO BOXES ──────────────────────────── */
+    .tco-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+    @media(max-width:600px){ .tco-grid { grid-template-columns: 1fr; } }
+    .tco-card { padding: 24px; border-radius: var(--radius); }
+    .tco-card.open { background: rgba(63,185,80,.07); border: 1px solid rgba(63,185,80,.25); }
+    .tco-card.commercial { background: rgba(248,81,73,.07); border: 1px solid rgba(248,81,73,.2); }
+    .tco-card .label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+    .tco-card.open .label { color: var(--accent2); }
+    .tco-card.commercial .label { color: var(--danger); }
+    .tco-card .amount { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+    .tco-card.open .amount { color: var(--accent2); }
+    .tco-card.commercial .amount { color: var(--danger); }
+    .tco-card .note { font-size: 13px; color: var(--muted); }
+
+    /* ── CALLOUT ────────────────────────────── */
+    .callout {
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin: 20px 0;
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .callout.info    { background: rgba(88,166,255,.07);  border: 1px solid rgba(88,166,255,.2); }
+    .callout.success { background: rgba(63,185,80,.07);   border: 1px solid rgba(63,185,80,.2); }
+    .callout.warn    { background: rgba(210,153,34,.07);  border: 1px solid rgba(210,153,34,.2); }
+    .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .callout-body { font-size: 14px; color: #c9d1d9; }
+    .callout-body strong { color: var(--text); }
+
+    /* ── FOOTER ─────────────────────────────── */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 40px 24px;
+      text-align: center;
+    }
+    footer p { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ── NAV ────────────────────────────────── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,17,23,.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+    }
+    .nav-inner {
+      max-width: var(--max-w); margin: 0 auto;
+      display: flex; align-items: center; gap: 24px;
+      height: 52px; overflow-x: auto;
+    }
+    .nav-inner a {
+      color: var(--muted); text-decoration: none;
+      font-size: 13px; font-weight: 500;
+      white-space: nowrap;
+      padding: 4px 0;
+      border-bottom: 2px solid transparent;
+      transition: color .15s, border-color .15s;
+    }
+    .nav-inner a:hover { color: var(--text); border-color: var(--border); }
+    .nav-logo { font-weight: 800; font-size: 14px; color: var(--text); margin-right: auto; white-space: nowrap; }
+
+    @media(max-width:640px){
+      .stat-bar { gap: 24px; }
+      .stat .num { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ─────────────────────────────────── -->
+<nav>
+  <div class="nav-inner">
+    <span class="nav-logo">FER · MIT Capstone</span>
+    <a href="#problem">Problem</a>
+    <a href="#dataset">Dataset</a>
+    <a href="#models">Models</a>
+    <a href="#results">Results</a>
+    <a href="#insights">Insights</a>
+    <a href="#deployment">Deployment</a>
+    <a href="#limitations">Limitations</a>
+  </div>
+</nav>
+
+<!-- ── HERO ─────────────────────────────────── -->
+<header class="hero">
+  <div class="badge">MIT Applied AI &amp; Data Science — Capstone 2026</div>
+  <h1>Facial Emotion Recognition<br/><span>Using Deep Learning</span></h1>
+  <p class="subtitle">A Custom CNN Architecture for Driver Fatigue Detection in Public Transportation</p>
+  <p class="meta">By <strong>Kinn Coelho Julião</strong> &nbsp;·&nbsp; March 2026 &nbsp;·&nbsp; MIT Professional Education</p>
+
+  <div class="stat-bar">
+    <div class="stat"><div class="num">82.03%</div><div class="lbl">Test Accuracy</div></div>
+    <div class="stat"><div class="num">0.82</div><div class="lbl">Macro F1</div></div>
+    <div class="stat"><div class="num">6</div><div class="lbl">Architectures</div></div>
+    <div class="stat"><div class="num">20,214</div><div class="lbl">Training Images</div></div>
+    <div class="stat"><div class="num">+30.47pp</div><div class="lbl">Improvement vs Baseline</div></div>
+  </div>
+
+  <div class="hero-links">
+    <a class="btn btn-primary" href="facial_emotion_recognition_paper.pdf" target="_blank">📄 Read the Paper</a>
+    <a class="btn btn-secondary" href="facial_emotion_recognition_presentation.pdf" target="_blank">📊 Slides</a>
+    <a class="btn btn-secondary" href="facial_emotion_recognition_capstone.html" target="_blank">📓 Full Notebook</a>
+    <a class="btn btn-secondary" href="https://github.com/kinncj/mit-applied-ai-and-data-sience" target="_blank">⌥ GitHub</a>
+  </div>
+</header>
+
+<!-- ── ABSTRACT ──────────────────────────────── -->
+<section id="abstract">
+  <div class="container">
+    <span class="section-label">Abstract</span>
+    <h2>Overview</h2>
+    <p>This paper presents a systematic deep learning study for four-class facial emotion recognition (Happy, Neutral, Sad, Surprise) applied to 48×48 pixel grayscale images. Six architectures were evaluated: an ANN baseline, two custom CNNs, three transfer learning models (VGG16, ResNet50V2, EfficientNetB0), and a purpose-built Complex CNN with five convolutional blocks, batch normalization, and data augmentation.</p>
+    <p>The Complex CNN achieved <strong>82.03% test accuracy (Macro F1: 0.82)</strong> on a balanced 128-image test set, outperforming the best transfer learning model by <strong>21.87 percentage points</strong>. The primary failure mode — Neutral/Sad confusion — reflects documented human perception limits at low-intensity affect.</p>
+    <div class="callout success">
+      <span class="callout-icon">🚌</span>
+      <div class="callout-body">The model is proposed as the inference core of an open-source, edge-deployable driver monitoring system for public transportation fleets, with a 5-year total cost of ownership estimated at 36–66% lower than commercial alternatives for a 10,000-vehicle fleet.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROBLEM ────────────────────────────────── -->
+<section id="problem">
+  <div class="container">
+    <span class="section-label">Problem Statement</span>
+    <h2>Four emotions, one classification task</h2>
+    <p>The technical task is a four-class image classification problem. Given a 48×48 pixel grayscale image of a human face, the model must predict one of four emotion labels. In the driver monitoring context, each class maps directly to a safety state.</p>
+
+    <div class="card-grid col4" style="margin:28px 0;">
+      <div class="card emotion-card happy">
+        <div class="emoji">😊</div>
+        <h3>Happy</h3>
+        <p>Alert and engaged — nominal operating state</p>
+      </div>
+      <div class="card emotion-card neutral">
+        <div class="emoji">😐</div>
+        <h3>Neutral</h3>
+        <p>Baseline — monitoring for degradation</p>
+      </div>
+      <div class="card emotion-card sad">
+        <div class="emoji">😔</div>
+        <h3>Sad</h3>
+        <p>Fatigue onset — primary detection target</p>
+      </div>
+      <div class="card emotion-card surprise">
+        <div class="emoji">😮</div>
+        <h3>Surprise</h3>
+        <p>Sudden event response — hazard or near-miss</p>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">The Neutral/Sad boundary is separated by only <strong>3.27 mean pixel intensity points</strong> out of 255. Their standard deviations are nearly identical (~64 units), so the distinguishing information is <em>spatial</em>, not intensity-based. That's the core reason fully connected networks don't work here.</div>
+    </div>
+
+    <h3 style="margin-top:32px;">Why It Matters</h3>
+    <p>Driver fatigue contributes to <strong>17.6% of all fatal crashes</strong> in the United States (AAA Foundation, 2024), with an annual societal cost of $109 billion (NHTSA). In public transportation — school buses carrying 21.4 million US children daily, 65,000 transit buses serving cities nationwide — a single fatigue-related incident carries severe human and financial consequences.</p>
+    <p>The EU General Safety Regulation mandated driver monitoring systems on all new vehicles from July 2024. The US NHTSA is developing parallel requirements. Governments are not deciding <em>whether</em> to adopt this technology — they are deciding <em>how to procure it</em>.</p>
+  </div>
+</section>
+
+<!-- ── DATASET ────────────────────────────────── -->
+<section id="dataset">
+  <div class="container">
+    <span class="section-label">Dataset</span>
+    <h2>20,214 Facial Images Across 4 Classes</h2>
+    <p>All images are 48×48 pixels in grayscale format. The test set is perfectly balanced at 32 images per class, ensuring accuracy figures are not inflated by any majority class.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Split</th><th>Total</th><th>Happy</th><th>Neutral</th><th>Sad</th><th>Surprise</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Training</td><td>15,109</td><td>3,976</td><td>3,978</td><td>3,982</td><td>3,173</td></tr>
+          <tr><td>Validation</td><td>4,977</td><td>1,825</td><td>1,216</td><td>1,139</td><td>797</td></tr>
+          <tr><td><strong>Test</strong></td><td><strong>128</strong></td><td><strong>32</strong></td><td><strong>32</strong></td><td><strong>32</strong></td><td><strong>32</strong></td></tr>
+          <tr class="highlight"><td>Total</td><td>20,214</td><td>5,833</td><td>5,226</td><td>5,153</td><td>4,002</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <figure class="figure">
+      <img src="paper_figures/fig_dataset_distribution_0.png" alt="Dataset distribution across splits and classes" />
+      <figcaption>Figure 1. Image count per class across training, validation, and test splits.</figcaption>
+    </figure>
+
+    <h3>Pixel Intensity Analysis</h3>
+    <p>Per-class pixel statistics reveal the core classification challenge. Mean intensity values differ only modestly, and standard deviations are nearly uniform — confirming that spatial structure, not brightness, is the discriminative signal.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Class</th><th>Mean Intensity</th><th>Std Dev</th><th>Visual Characteristics</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>😊 Happy</td><td>130.62</td><td>63.59</td><td>Most visually distinct — broad smiles, Duchenne markers</td></tr>
+          <tr><td>😐 Neutral</td><td>123.99</td><td>64.98</td><td>Defined by <em>absence</em> of expression — most ambiguous class</td></tr>
+          <tr><td>😔 Sad</td><td>120.72</td><td>64.63</td><td>Only 3.27 points below Neutral mean</td></tr>
+          <tr><td>😮 Surprise</td><td>147.25</td><td>63.90</td><td>Brightest class — wide eyes, open mouth</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <figure class="figure">
+      <img src="paper_figures/fig_pixel_statistics_0.png" alt="Mean pixel intensity per class" />
+      <figcaption>Figure 2. Mean pixel intensity ± standard deviation per class (first 500 training images each).</figcaption>
+    </figure>
+
+    <h3 style="margin-top:32px;">Sample Images by Class</h3>
+    <div class="figure-row">
+      <figure class="figure">
+        <img src="paper_figures/fig_happy_samples_0.png" alt="Happy samples" />
+        <figcaption>😊 Happy</figcaption>
+      </figure>
+      <figure class="figure">
+        <img src="paper_figures/fig_neutral_samples_0.png" alt="Neutral samples" />
+        <figcaption>😐 Neutral</figcaption>
+      </figure>
+      <figure class="figure">
+        <img src="paper_figures/fig_sad_samples_0.png" alt="Sad samples" />
+        <figcaption>😔 Sad</figcaption>
+      </figure>
+      <figure class="figure">
+        <img src="paper_figures/fig_surprise_samples_0.png" alt="Surprise samples" />
+        <figcaption>😮 Surprise</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ── MODELS ──────────────────────────────────── -->
+<section id="models">
+  <div class="container">
+    <span class="section-label">Model Architectures</span>
+    <h2>Six architectures</h2>
+    <p>Six architectures were evaluated in sequence, each motivated by the failures observed in the previous model. All share the same final classification head and training data pipeline.</p>
+
+    <div style="margin:32px 0;">
+      <h3>ANN baseline</h3>
+      <p>A fully connected network with two hidden layers (256 and 128 units, ReLU, dropout 0.4/0.3). Treats each pixel as an independent feature — discarding all spatial relationships. EarlyStopping triggered at epoch 13.</p>
+      <figure class="figure">
+        <img src="paper_figures/fig_ann_training_0.png" alt="ANN training curves" />
+        <figcaption>Figure 4. ANN Baseline training history (15 epochs max, early stopped at epoch 13).</figcaption>
+      </figure>
+    </div>
+
+    <div style="margin:32px 0;">
+      <h3>CNN Models 1 and 2</h3>
+      <p><strong>CNN Model 1</strong> (2 conv blocks: 32→64 filters, MaxPooling, Dropout 0.25) introduces spatial feature detection. The <strong>+17.97 pp improvement</strong> over ANN quantifies the value of understanding <em>where</em> features occur on a face. <strong>CNN Model 2</strong> adds a third block (128 filters), gaining +5.47 pp.</p>
+      <div class="figure-row">
+        <figure class="figure">
+          <img src="paper_figures/fig_cnn1_training_0.png" alt="CNN Model 1 training" />
+          <figcaption>CNN Model 1 (69.53%)</figcaption>
+        </figure>
+        <figure class="figure">
+          <img src="paper_figures/fig_cnn2_training_0.png" alt="CNN Model 2 training" />
+          <figcaption>CNN Model 2 (75.00%)</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div style="margin:32px 0;">
+      <h3>Transfer learning</h3>
+      <p>Three ImageNet-pretrained architectures (VGG16, ResNet50V2, EfficientNetB0) with frozen base layers and custom classification heads. Despite hundreds of millions of parameters, all three <strong>underperformed CNN Model 1</strong>.</p>
+      <div class="callout warn">
+        <span class="callout-icon">🔬</span>
+        <div class="callout-body">Three things compounded against all of them: the ImageNet features are tuned for high-res color object photos (domain gap), the models expect 224×224+ inputs so most spatial detail is gone at 48×48 (resolution mismatch), and grayscale replicated to 3 channels doesn't activate any of the color-sensitive features they were trained on (modality mismatch).</div>
+      </div>
+      <div class="figure-row">
+        <figure class="figure">
+          <img src="paper_figures/fig_vgg16_training_0.png" alt="VGG16 training" />
+          <figcaption>VGG16 (51.56%)</figcaption>
+        </figure>
+        <figure class="figure">
+          <img src="paper_figures/fig_resnet_training_0.png" alt="ResNet50V2 training" />
+          <figcaption>ResNet50V2 (55.47%)</figcaption>
+        </figure>
+        <figure class="figure">
+          <img src="paper_figures/fig_efficientnet_training_0.png" alt="EfficientNetB0 training" />
+          <figcaption>EfficientNetB0 (60.16%)</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div style="margin:32px 0;">
+      <h3>Complex CNN — final architecture</h3>
+      <p>Designed specifically to address every failure mode in the experimental record. Five convolutional blocks (32→64→128→256→512 filters), Batch Normalization at every layer, data augmentation (rotation ±15°, zoom ±10%, horizontal flip), and ReduceLROnPlateau enabling 30 full epochs of improvement.</p>
+      <figure class="figure">
+        <img src="paper_figures/fig_complex_cnn_annotated.png" alt="Complex CNN architecture diagram" />
+        <figcaption>Figure 7. Complex CNN architecture overview with annotation.</figcaption>
+      </figure>
+      <figure class="figure">
+        <img src="paper_figures/fig_complex_cnn_training_0.png" alt="Complex CNN training curves" />
+        <figcaption>Complex CNN training history over 30 epochs with learning rate reduction events. Training accuracy continues improving through all 30 epochs — evidence that batch normalization and augmentation prevent premature convergence.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ── RESULTS ─────────────────────────────────── -->
+<section id="results">
+  <div class="container">
+    <span class="section-label">Results</span>
+    <h2>+30.47 pp from ANN to Complex CNN</h2>
+    <p>The full progression from ANN baseline to the Complex CNN, achieved entirely through architectural choices on the same training data.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Architecture</th><th>Test Accuracy</th><th>Test Loss</th><th>Macro F1</th><th>Category</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ANN Baseline</td><td>51.56%</td><td>1.1095</td><td>0.51</td><td><span class="pill pill-gray">Baseline</span></td></tr>
+          <tr><td>VGG16</td><td>51.56%</td><td>1.1832</td><td>0.52</td><td><span class="pill pill-gray">Transfer</span></td></tr>
+          <tr><td>ResNet50V2</td><td>55.47%</td><td>1.0878</td><td>0.55</td><td><span class="pill pill-gray">Transfer</span></td></tr>
+          <tr><td>EfficientNetB0</td><td>60.16%</td><td>0.9352</td><td>0.59</td><td><span class="pill pill-gray">Transfer</span></td></tr>
+          <tr><td>CNN Model 1</td><td>69.53%</td><td>0.7483</td><td>0.70</td><td><span class="pill pill-blue">Custom CNN</span></td></tr>
+          <tr><td>CNN Model 2</td><td>75.00%</td><td>0.6780</td><td>0.75</td><td><span class="pill pill-blue">Custom CNN</span></td></tr>
+          <tr class="highlight"><td>Complex CNN (Ours)</td><td>82.03%</td><td>0.5634</td><td>0.82</td><td><span class="pill pill-green">Final Model</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <figure class="figure">
+      <img src="paper_figures/fig_model_comparison_clean.png" alt="Model accuracy comparison" />
+      <figcaption>Figure 8. Test accuracy across all architectures. Transfer learning models fail to exceed CNN Model 1, and the Complex CNN surpasses the 80% target.</figcaption>
+    </figure>
+
+    <h3 style="margin-top:36px;">Per-Class Performance — Complex CNN</h3>
+    <p>Strong performance on visually distinctive emotions; predictable challenge on the Neutral/Sad boundary.</p>
+
+    <div class="card" style="margin:20px 0;">
+      <div class="progress-list">
+        <div class="progress-item">
+          <div class="progress-header"><span class="progress-label">😊 Happy — F1: 0.89</span><span class="progress-value">P: 0.93 · R: 0.84</span></div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill fill-green" style="width:89%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-header"><span class="progress-label">😮 Surprise — F1: 0.89</span><span class="progress-value">P: 0.90 · R: 0.88</span></div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill fill-purple" style="width:89%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-header"><span class="progress-label">😔 Sad — F1: 0.77</span><span class="progress-value">P: 0.82 · R: 0.72</span></div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill fill-blue" style="width:77%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-header"><span class="progress-label">😐 Neutral — F1: 0.75</span><span class="progress-value">P: 0.68 · R: 0.84</span></div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill fill-gray" style="width:75%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <figure class="figure">
+      <img src="paper_figures/fig_final_model_metrics.png" alt="Final model per-class metrics" />
+      <figcaption>Figure 9. Per-class Precision, Recall, and F1-Score for the Complex CNN.</figcaption>
+    </figure>
+
+    <h3 style="margin-top:36px;">Confusion Matrix</h3>
+    <p>The primary confusion pair is Neutral ↔ Sad — consistent with the 3.27-point mean pixel intensity separation. Happy and Surprise dominate the diagonal with clear visual signals.</p>
+    <figure class="figure">
+      <img src="paper_figures/fig_confusion_matrix_1.png" alt="Confusion matrix" />
+      <figcaption>Figure 10. Confusion matrix for the Complex CNN on the 128-image test set (32 per class). The Neutral/Sad off-diagonal entries reflect the 3.27-point mean pixel intensity separation.</figcaption>
+    </figure>
+
+    <h3 style="margin-top:36px;">Cross-Architecture Per-Class Analysis</h3>
+    <figure class="figure">
+      <img src="paper_figures/fig_perclass_heatmap.png" alt="Per-class heatmap across all models" />
+      <figcaption>Figure 11. Per-class Precision, Recall, and F1-Score heatmaps across all seven architectures. Green = high performance, Red = poor. The Complex CNN improvement is visible across all metrics.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ── INSIGHTS ────────────────────────────────── -->
+<section id="insights">
+  <div class="container">
+    <span class="section-label">Key Insights</span>
+    <h2>Six Lessons from the Experimental Record</h2>
+
+    <div class="insight-list" style="margin-top:28px;">
+      <div class="insight">
+        <div class="insight-num">1</div>
+        <div class="insight-body">
+          <h3>Spatial structure is the enabling mechanism</h3>
+          <p>The +17.97 pp jump from ANN (51.56%) to CNN Model 1 (69.53%) on identical data quantifies the value of spatial feature detection. Understanding <em>where</em> features appear on a face — not merely that they exist — is the core capability.</p>
+        </div>
+      </div>
+      <div class="insight">
+        <div class="insight-num">2</div>
+        <div class="insight-body">
+          <h3>Depth and regularization must co-occur</h3>
+          <p>CNN Model 2 plateaued early without batch normalization. The Complex CNN's 30-epoch continuous improvement demonstrates that batch normalization allows full exploitation of architectural depth.</p>
+        </div>
+      </div>
+      <div class="insight">
+        <div class="insight-num">3</div>
+        <div class="insight-body">
+          <h3>Transfer learning underperformed on this domain</h3>
+          <p>VGG16, ResNet50V2, and EfficientNetB0 — containing hundreds of millions of ImageNet-trained parameters — all underperformed CNN Model 1. Pre-training on the wrong domain is as limiting as no pre-training.</p>
+        </div>
+      </div>
+      <div class="insight">
+        <div class="insight-num">4</div>
+        <div class="insight-body">
+          <h3>Engineering discipline is a real differentiator</h3>
+          <p>A single preprocessing mismatch during EfficientNetB0 experiments caused complete model failure. Knowing each architecture's preprocessing contract is a non-trivial skill that compounds into results.</p>
+        </div>
+      </div>
+      <div class="insight">
+        <div class="insight-num">5</div>
+        <div class="insight-body">
+          <h3>Surprise is the most learnable emotion at 48×48</h3>
+          <p>Despite 20% fewer training samples, Surprise achieves F1 0.89 — equal to Happy. Its compound visual signal (raised brows + wide eyes + open jaw) provides redundant features that remain discriminative at low resolution.</p>
+        </div>
+      </div>
+      <div class="insight">
+        <div class="insight-num">6</div>
+        <div class="insight-body">
+          <h3>The Neutral/Sad boundary is the central challenge — and the central safety target</h3>
+          <p>The Complex CNN's resolution of this boundary (Neutral F1: 0.75, Sad F1: 0.77) compared to CNN Model 2 (0.72, 0.63) is the key advance for the driver monitoring application — these are the two states that determine fatigue detection.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── DEPLOYMENT ──────────────────────────────── -->
+<section id="deployment">
+  <div class="container">
+    <span class="section-label">Deployment Case Study</span>
+    <h2>Open-Source Public Transportation DMS</h2>
+    <p>The proposed deployment is an edge-inference driver monitoring system for public transportation fleets. All inference runs locally on an embedded device mounted inside the vehicle cab. <strong>No face images leave the vehicle during normal operation.</strong></p>
+
+    <h3 style="margin:28px 0 12px;">Hardware Stack — $500/vehicle Year 1</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Component</th><th>Unit Cost</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Raspberry Pi Camera Module 3 NoIR</td><td>$25</td><td>IR-capable, 12MP, designed for Pi 5</td></tr>
+          <tr><td>Raspberry Pi 5 (8GB RAM)</td><td>$80</td><td>Sufficient for real-time CNN inference</td></tr>
+          <tr><td>Waveshare SIM7600G-H 4G LTE HAT</td><td>$50</td><td>Cellular telemetry — event metadata only</td></tr>
+          <tr><td>Enclosure, power, mounting, alerts</td><td>$145</td><td>Off-the-shelf components</td></tr>
+          <tr><td><strong>Total hardware</strong></td><td><strong>$300</strong></td><td></td></tr>
+          <tr><td>Installation</td><td>$200</td><td>Fleet technician, one-time</td></tr>
+          <tr class="highlight"><td>Year 1 Total</td><td>$500/vehicle</td><td>+ ~$40–50/yr ongoing (cellular + maintenance)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin:36px 0 16px;">5-Year Total Cost of Ownership — 10,000 Vehicles</h3>
+
+    <div class="tco-grid">
+      <div class="tco-card open">
+        <div class="label">Open Source (This Model)</div>
+        <div class="amount">$7.5M</div>
+        <div class="note">$500/vehicle Year 1 + $500K/year federal maintenance team. Zero subscription fees. Full auditability. Permanent public ownership.</div>
+      </div>
+      <div class="tco-card commercial">
+        <div class="label">Commercial Alternatives</div>
+        <div class="amount">$6.5–$18.5M</div>
+        <div class="note">$200–$700 hardware + $100–$300/vehicle/year subscriptions. Vendor lock-in. Black-box inference. Discontinuation risk.</div>
+      </div>
+    </div>
+
+    <figure class="figure">
+      <img src="paper_figures/fig_cost_comparison.png" alt="5-year TCO comparison" />
+      <figcaption>Figure 12. 5-year Total Cost of Ownership: open-source vs. commercial estimates across fleet sizes. The open-source advantage grows with scale — at 10,000 vehicles, savings range from $5M to $21M over 5 years.</figcaption>
+    </figure>
+
+    <div class="callout info">
+      <span class="callout-icon">🏛️</span>
+      <div class="callout-body">Full auditability (any government body can inspect every inference decision) and sovereignty (no vendor lock-in; the IP stays in the public domain permanently). The EU GSR framework puts governments in an unusual position: they're both mandating this technology and operating the largest fleets that need it.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── LIMITATIONS ────────────────────────────── -->
+<section id="limitations">
+  <div class="container">
+    <span class="section-label">Limitations &amp; Future Work</span>
+    <h2>Known Gaps Before Production</h2>
+
+    <div class="card-grid col2" style="margin:24px 0;">
+      <div class="card">
+        <h3>Small test set</h3>
+        <p style="font-size:14px;">128 images (32/class). Results should be validated on a larger held-out set before production. Confidence intervals are wide at n=32.</p>
+      </div>
+      <div class="card">
+        <h3>Neutral/Sad performance</h3>
+        <p style="font-size:14px;">F1 0.75/0.77 — substantially improved, but not yet sufficient for standalone safety-critical decisions. Should function as one signal among several.</p>
+      </div>
+      <div class="card">
+        <h3>Demographic bias</h3>
+        <p style="font-size:14px;">Training data has not been independently audited across age, gender, and ethnicity. A bias audit with disaggregated metrics is required before public deployment.</p>
+      </div>
+      <div class="card">
+        <h3>No face detection</h3>
+        <p style="font-size:14px;">The model expects a pre-cropped, centered face. A separate upstream face detection step (MTCNN or OpenCV Haar Cascade) is required for video deployment.</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:32px;">Future directions</h3>
+    <ul style="color:#c9d1d9; padding-left:20px; line-height:2;">
+      <li>Higher resolution input (96×96 or 224×224) for more spatial detail on the Neutral/Sad boundary</li>
+      <li>Facial landmark features as additional model inputs — encoding geometry of mouth corners and brow elevation</li>
+      <li>Real-time video pipeline with temporal smoothing: ≥3 consecutive frames before triggering an alert</li>
+      <li>Domain-specific pre-training on large-scale FER datasets (AffectNet, RAF-DB)</li>
+      <li>Government consortium model: multiple transit agencies sharing architecture and jointly funding a maintenance team</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ── CONCLUSION ──────────────────────────────── -->
+<section id="conclusion">
+  <div class="container">
+    <span class="section-label">Conclusion</span>
+    <h2>Conclusion</h2>
+    <p>A purpose-built convolutional neural network significantly outperforms transfer learning approaches for facial emotion recognition on domain-specific low-resolution grayscale data. The Complex CNN achieves <strong>82.03% test accuracy and Macro F1 of 0.82</strong> — exceeding the project target and outperforming EfficientNetB0 by 21.87 percentage points.</p>
+
+    <div class="callout success">
+      <span class="callout-icon">✅</span>
+      <div class="callout-body">
+        Domain alignment matters more than model size — ImageNet features don't transfer to 48×48 grayscale facial expressions.<br/><br/>
+        Depth and regularization have to work together — batch normalization is what let the model keep improving across all 30 epochs, where the simpler architectures stalled out.<br/><br/>
+        Evidence-based iteration compounds — every architectural choice in the Complex CNN traces back to a specific failure in the experimental record.
+      </div>
+    </div>
+
+    <p style="margin-top:20px;">The model is technically deployable today as a supporting signal within a multi-sensor safety system — pending bias auditing and validation on a larger held-out dataset.</p>
+  </div>
+</section>
+
+<!-- ── FOOTER ──────────────────────────────────── -->
+<footer>
+  <div class="container">
+    <p><strong>Facial Emotion Recognition Using Deep Learning</strong></p>
+    <p>Kinn Coelho Julião · MIT Professional Education: Applied Data Science &amp; AI Program · March 2026</p>
+    <p style="margin-top:16px;">
+      <a href="facial_emotion_recognition_paper.pdf">📄 Paper</a> &nbsp;·&nbsp;
+      <a href="facial_emotion_recognition_presentation.pdf">📊 Slides</a> &nbsp;·&nbsp;
+      <a href="facial_emotion_recognition_capstone.html">📓 Notebook</a> &nbsp;·&nbsp;
+      <a href="https://github.com/kinncj/mit-applied-ai-and-data-sience">⌥ GitHub</a>
+    </p>
+    <p style="margin-top:16px;">Licensed under <a href="LICENSE">AGPL-3.0</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
